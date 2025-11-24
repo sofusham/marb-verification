@@ -12,6 +12,13 @@ class cl_marb_tb_virtual_sequencer(uvm_sequencer):
         # Register model handler
         self.reg_model = None
 
+        self.sequencer = None
+
+        self.sequencer_producer0_agent = None
+        self.sequencer_producer1_agent = None
+        self.sequencer_producer2_agent = None
+        self.sequencer_consumer_agent = None
+
 
     def build_phase(self):
         self.logger.info("Start build_phase() -> MARB virtual sequencer")

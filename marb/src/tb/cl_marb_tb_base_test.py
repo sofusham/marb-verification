@@ -36,7 +36,6 @@ class cl_marb_tb_base_test(uvm_test):
         # Access the DUT through the cocotb.top handler
         self.dut = cocotb.top
 
-
         # APB configuration interface
         self.apb_if = None
 
@@ -55,6 +54,37 @@ class cl_marb_tb_base_test(uvm_test):
 
         # Create configuration object
         self.cfg = cl_marb_tb_config("cfg")
+
+        # Access DUT
+        self.dut = cocotb.top
+        self.cfg.dut = self.dut
+        
+        # Pass data and addr width from DUT top level to cfg
+        self.cfg.data_width = self.dut.DATA_WIDTH.value
+        self.cfg.addr_width = self.dut.ADDR_WIDTH.value 
+
+        self.cfg.sdt_prod0_cfg.DATA_WIDTH = self.dut.DATA_WIDTH.value
+        self.cfg.sdt_prod0_cfg.ADDR_WIDTH = self.dut.ADDR_WIDTH.value
+
+        self.cfg.sdt_prod1_cfg.DATA_WIDTH = self.dut.DATA_WIDTH.value
+        self.cfg.sdt_prod1_cfg.ADDR_WIDTH = self.dut.ADDR_WIDTH.value
+
+        self.cfg.sdt_prod2_cfg.DATA_WIDTH = self.dut.DATA_WIDTH.value
+        self.cfg.sdt_prod2_cfg.ADDR_WIDTH = self.dut.ADDR_WIDTH.value
+    
+        self.cfg.sdt_cons_cfg.DATA_WIDTH = self.dut.DATA_WIDTH.value
+        self.cfg.sdt_cons_cfg.ADDR_WIDTH = self.dut.ADDR_WIDTH.value
+
+        # SDT vif configuration ----------------------------------------
+        self.cfg.sdt_prod0_cfg.vif = cl_sdt_interface(clk_signal = self.dut.clk, rst_signal = self.dut.rst, name = "sdt_prod0_vif")
+
+        self.cfg.sdt_prod1_cfg.vif = cl_sdt_interface(clk_signal = self.dut.clk, rst_signal = self.dut.rst, name = "sdt_prod1_vif")
+
+        self.cfg.sdt_prod2_cfg.vif = cl_sdt_interface(clk_signal = self.dut.clk, rst_signal = self.dut.rst, name = "sdt_prod2_vif")
+
+        self.cfg.sdt_cons_cfg.vif = cl_sdt_interface(clk_signal = self.dut.clk, rst_signal = self.dut.rst, name = "sdt_cons_vif") 
+
+        # --------------------------------------------------------------
 
         # APB agent configuration
         self.cfg.apb_cfg.driver                      = apb_common.DriverType.PRODUCER
@@ -97,7 +127,55 @@ class cl_marb_tb_base_test(uvm_test):
         self.logger.info("Start connect_phase() -> MARB base test")
         super().connect_phase()
 
+        self.cfg.sdt_prod0_cfg.vif._set_width_values(ADDR_WIDTH = self.cfg.addr_width,
+                                                     DATA_WIDTH = self.cfg.data_width)
 
+        self.cfg.sdt_prod1_cfg.vif._set_width_values(ADDR_WIDTH = self.cfg.addr_width,
+                                                     DATA_WIDTH = self.cfg.data_width)
+
+        self.cfg.sdt_prod2_cfg.vif._set_width_values(ADDR_WIDTH = self.cfg.addr_width,
+                                                     DATA_WIDTH = self.cfg.data_width)
+
+        self.cfg.sdt_cons_cfg.vif._set_width_values(ADDR_WIDTH = self.cfg.addr_width,
+                                                    DATA_WIDTH = self.cfg.data_width)
+
+         # Connect DUT signals to SDT IFs                                                     
+        self.cfg.sdt_prod0_cfg.vif.connect(#clk_signal     = self.dut.clk,
+                                         #rst_signal      = self.dut.rst,
+                                         rd_signal       = self.dut.c0_rd,
+                                         wr_signal       = self.dut.c0_wr,
+                                         addr_signal     = self.dut.c0_addr,
+                                         rd_data_signal  = self.dut.c0_rd_data,
+                                         wr_data_signal  = self.dut.c0_wr_data,
+                                         ack_signal      = self.dut.c0_ack)
+
+        self.cfg.sdt_prod1_cfg.vif.connect(#clk_signal     = self.dut.clk,
+                                         #rst_signal      = self.dut.rst,
+                                         rd_signal       = self.dut.c1_rd,
+                                         wr_signal       = self.dut.c1_wr,
+                                         addr_signal     = self.dut.c1_addr,
+                                         rd_data_signal  = self.dut.c1_rd_data,
+                                         wr_data_signal  = self.dut.c1_wr_data,
+                                         ack_signal      = self.dut.c1_ack)    
+
+        self.cfg.sdt_prod2_cfg.vif.connect(#clk_signal     = self.dut.clk,
+                                         #rst_signal      = self.dut.rst,
+                                         rd_signal       = self.dut.c2_rd,
+                                         wr_signal       = self.dut.c2_wr,
+                                         addr_signal     = self.dut.c2_addr,
+                                         rd_data_signal  = self.dut.c2_rd_data,
+                                         wr_data_signal  = self.dut.c2_wr_data,
+                                         ack_signal      = self.dut.c2_ack)
+        
+        self.cfg.sdt_cons_cfg.vif.connect(#clk_signal     = self.dut.clk,
+                                         #rst_signal      = self.dut.rst,
+                                         rd_signal       = self.dut.m_rd,
+                                         wr_signal       = self.dut.m_wr,
+                                         addr_signal     = self.dut.m_addr,
+                                         rd_data_signal  = self.dut.m_rd_data,
+                                         wr_data_signal  = self.dut.m_wr_data,
+                                         ack_signal      = self.dut.m_ack)   
+                                              
         self.apb_if.connect(wr_signal            = self.dut.conf_wr,
                             sel_signal           = self.dut.conf_sel,
                             enable_signal        = self.dut.conf_enable,

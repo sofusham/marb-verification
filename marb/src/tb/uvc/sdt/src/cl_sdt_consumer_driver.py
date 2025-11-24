@@ -12,12 +12,6 @@ class cl_sdt_consumer_driver(cl_sdt_base_driver):
         self.vif.rd_data.value = LogicArray(self.cfg.rd_data_no_ack_value * self.cfg.DATA_WIDTH)
         self.vif.ack.value     = 0
 
-    async def flushing_queue(self):
-        self.logger.debug("Consumer flushing queue")
-        # Flushing data queue
-        while self.rd_data_queue.empty() == False:
-            self.rd_data_queue.get_nowait()
-
     async def drive_pins(self):
         self.logger.debug("Consumer driver waiting for RD or WR")
 
@@ -47,10 +41,6 @@ class cl_sdt_consumer_driver(cl_sdt_base_driver):
         self.vif.ack.value = 1
         if self.vif.rd == 1:
             self.vif.rd_data.value = self.req.data
-            # Put rd_data in queue
-            self.rd_data_queue.put_nowait(self.req.data)
-        elif self.vif.wr == 1:
-            self.wr_data_queue.put_nowait(self.vif.wr_data.value.integer)
 
         self.logger.debug("Consumer driver have send response")
         await RisingEdge(self.vif.clk)

@@ -1,4 +1,5 @@
 from pyuvm import *
+from pyuvm import uvm_env
 
 from uvc.sdt.src import *
 
@@ -9,12 +10,19 @@ from reg_model.cl_reg_block import cl_reg_block
 from uvc.apb.src.cl_apb_agent import cl_apb_agent
 from uvc.apb.src.cl_apb_reg_adapter import cl_apb_reg_adapter
 
+from uvc.sdt.src.cl_sdt_agent import cl_sdt_agent
+
 class cl_marb_tb_env(uvm_env):
     def __init__(self, name, parent):
         super().__init__(name, parent)
 
         # Configuration object handle
         self.cfg = None
+
+        self.uvc_sdt_producer0 = None
+        self.uvc_sdt_producer1 = None
+        self.uvc_sdt_producer2 = None
+        self.uvc_sdt_consumer = None
 
         # Virtual sequencer
         self.virtual_sequencer = None
@@ -36,6 +44,19 @@ class cl_marb_tb_env(uvm_env):
         ConfigDB().set(self, "virtual_sequencer", "cfg", self.cfg)
         self.virtual_sequencer = cl_marb_tb_virtual_sequencer.create("virtual_sequencer", self)
 
+        # Instantiate producer UCV
+        self.uvc_sdt_producer0 = cl_sdt_agent.create("uvc_sdt_producer0", self)
+        ConfigDB().set(self, "uvc_sdt_producer0", "cfg", self.cfg.sdt_prod0_cfg)
+
+        self.uvc_sdt_producer1 = cl_sdt_agent.create("uvc_sdt_producer1", self)
+        ConfigDB().set(self, "uvc_sdt_producer1", "cfg", self.cfg.sdt_prod1_cfg)
+
+        self.uvc_sdt_producer2 = cl_sdt_agent.create("uvc_sdt_producer2", self)
+        ConfigDB().set(self, "uvc_sdt_producer2", "cfg", self.cfg.sdt_prod2_cfg)
+
+        # Instantiate consumer UCV
+        self.uvc_sdt_consumer = cl_sdt_agent.create("uvc_sdt_consumer", self)
+        ConfigDB().set(self, "uvc_sdt_consumer", "cfg", self.cfg.sdt_cons_cfg)
 
         # Instantiate the APB UVC and pass handler to cfg
         ConfigDB().set(self, "apb_agent", "cfg", self.cfg.apb_cfg)
@@ -52,6 +73,11 @@ class cl_marb_tb_env(uvm_env):
     def connect_phase(self):
         self.logger.info("Start connect_phase() -> MARB env")
         super().connect_phase()
+
+        self.virtual_sequencer.sequencer_producer0_agent = self.uvc_sdt_producer0.sequencer
+        self.virtual_sequencer.sequencer_producer1_agent = self.uvc_sdt_producer1.sequencer
+        self.virtual_sequencer.sequencer_producer2_agent = self.uvc_sdt_producer2.sequencer
+        self.virtual_sequencer.sequencer_consumer_agent = self.uvc_sdt_consumer.sequencer
 
 
         # Connect reg_model and APB sequencer

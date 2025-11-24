@@ -10,6 +10,7 @@ class cl_marb_tb_base_seq(uvm_sequence):
         super().__init__(name)
 
         self.cfg = None
+        
 
     async def pre_body(self):
         if(self.sequencer is not None):

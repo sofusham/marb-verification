@@ -31,9 +31,6 @@ class cl_sdt_base_driver(uvm_driver):
         # Get the configuration object
         self.cfg = ConfigDB().get(self, "", "cfg")
 
-        self.rd_data_queue = ConfigDB().get(self, '' , 'rd_data_queue')
-        self.wr_data_queue = ConfigDB().get(self, '' , 'wr_data_queue')
-
         # Get the virtual interface from the configuration object
         self.vif = self.cfg.vif
 
@@ -94,7 +91,6 @@ class cl_sdt_base_driver(uvm_driver):
     async def drive_transaction(self):
         while True:
             await self.drive_reset()
-            await self.flushing_queue()
 
             while self.vif.rst.value.binstr != '0':
                 await RisingEdge(self.vif.clk)
@@ -111,9 +107,6 @@ class cl_sdt_base_driver(uvm_driver):
 
     async def drive_reset(self):
         self.logger.info("Base driver - drive_reset task")
-
-    async def flushing_queue(self):
-        self.logger.info("Base driver - flushing_queue task")
 
     async def drive_pins(self):
         self.logger.info("Base driver - drive_pins task")
