@@ -120,13 +120,15 @@ class cl_marb_tb_base_test(uvm_test):
         ConfigDB().set(self, "marb_tb_env", "cfg", self.cfg)
         self.marb_tb_env = cl_marb_tb_env("marb_tb_env", self)
 
+        # Quick fix
+        uvm_factory().set_type_override_by_type(cl_sdt_seq_item, sdt_change_width(8,8))
 
         self.logger.info("End build_phase() -> MARB base test")
 
     def connect_phase(self):
         self.logger.info("Start connect_phase() -> MARB base test")
         super().connect_phase()
-
+        # Move to build
         self.cfg.sdt_prod0_cfg.vif._set_width_values(ADDR_WIDTH = self.cfg.addr_width,
                                                      DATA_WIDTH = self.cfg.data_width)
 

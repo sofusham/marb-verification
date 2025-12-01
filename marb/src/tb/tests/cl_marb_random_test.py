@@ -9,6 +9,9 @@ from vseqs.cl_reg_simple_seq import cl_reg_simple_seq
 from vseqs.cl_marb_basic_seq import cl_marb_basic_seq
 from uvc.sdt.src import *
 
+
+
+
 @pyuvm.test(timeout_time = 1000, timeout_unit = 'ns')
 class cl_marb_random_test(cl_marb_tb_base_test):
     """Random traffic test, default priotization"""
@@ -17,7 +20,11 @@ class cl_marb_random_test(cl_marb_tb_base_test):
         super().__init__(name, parent)
 
         # Create sequences
-        self.prod_seq = cl_sdt_single_seq.create("prod_seq")
+        """self.prod0_seq = cl_sdt_single_seq.create("prod0_seq")
+        self.prod0_seq.s_item = vsc.rand_attr(sdt_change_width(8,8).create(""))
+
+        self.prod1_seq = cl_sdt_single_seq.create("prod1_seq")
+        self.prod2_seq = cl_sdt_single_seq.create("prod2_seq")"""
         self.cons_seq = cl_sdt_consumer_rsp_seq.create("cons_seq")
 
 
@@ -31,7 +38,8 @@ class cl_marb_random_test(cl_marb_tb_base_test):
         conf_seq = cl_reg_simple_seq.create("conf_seq")
         conf_seq.randomize()
 
-        cocotb.start_soon(conf_seq.start(self.marb_tb_env.virtual_sequencer))
+        #cocotb.start_soon(conf_seq.start(self.marb_tb_env.virtual_sequencer))
+        await conf_seq.start(self.marb_tb_env.virtual_sequencer)
 
         # Launch sequences (as many consumer transactions as producer transactions)
         prod0_task = cocotb.start_soon(self.prod_transaction(10, self.marb_tb_env.virtual_sequencer.sequencer_producer0_agent))
@@ -48,8 +56,11 @@ class cl_marb_random_test(cl_marb_tb_base_test):
         self.logger.info("End run_phase() -> MARB random traffic test")
     
     async def prod_transaction(self, num, handle):
-        for _ in range(0, num):
-            await self.prod_seq.start(handle)
+        for i in range(0, num):
+            prod_seq = cl_sdt_single_seq.create("prod_seq")
+            prod_seq.randomize()
+            await prod_seq.start(handle)
+                    
             self.logger.info("Producer transaction done")
     
     async def cons_transaction(self, num, handle):
