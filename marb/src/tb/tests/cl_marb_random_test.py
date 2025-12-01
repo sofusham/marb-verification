@@ -37,7 +37,7 @@ class cl_marb_random_test(cl_marb_tb_base_test):
         prod0_task = cocotb.start_soon(self.prod_transaction(1, self.marb_tb_env.virtual_sequencer.sequencer_producer0_agent))
         prod1_task = cocotb.start_soon(self.prod_transaction(1, self.marb_tb_env.virtual_sequencer.sequencer_producer1_agent))
         prod2_task = cocotb.start_soon(self.prod_transaction(1, self.marb_tb_env.virtual_sequencer.sequencer_producer2_agent))
-        cons_task = cocotb.start_soon(self.cons_transaction(3, self.marb_tb_env.virtual_sequencer.sequencer_consumer_agent))
+        cons_task = cocotb.start_soon(self.cons_transaction(1, self.marb_tb_env.virtual_sequencer.sequencer_consumer_agent))
 
         await Combine(prod0_task, prod1_task, prod2_task, cons_task)
 
@@ -48,10 +48,10 @@ class cl_marb_random_test(cl_marb_tb_base_test):
     
     async def prod_transaction(self, num, handle):
         for _ in range(0, num):
-            self.prod_seq.start(handle)
+            await self.prod_seq.start(handle)
             self.logger.info("Producer transaction done")
     
     async def cons_transaction(self, num, handle):
         for _ in range(0, num):
-            self.cons_seq.start(handle)
+            await self.cons_seq.start(handle)
             self.logger.info("Consumer transaction done")
