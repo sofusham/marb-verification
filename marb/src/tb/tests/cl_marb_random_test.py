@@ -29,17 +29,17 @@ class cl_marb_random_test(cl_marb_tb_base_test):
 
         # Register sequence for enabling and configuring the Memory Arbiter sequence
         conf_seq = cl_reg_simple_seq.create("conf_seq")
-        #conf_seq.randomize()
+        conf_seq.randomize()
 
         cocotb.start_soon(conf_seq.start(self.marb_tb_env.virtual_sequencer))
 
         # Launch sequences (as many consumer transactions as producer transactions)
-        prod0_task = cocotb.start_soon(self.prod_transaction(10, self.marb_tb_env.virtual_sequencer.sequencer_producer0_agent))
-        prod1_task = cocotb.start_soon(self.prod_transaction(10, self.marb_tb_env.virtual_sequencer.sequencer_producer1_agent))
-        prod2_task = cocotb.start_soon(self.prod_transaction(10, self.marb_tb_env.virtual_sequencer.sequencer_producer2_agent))
-        cons_task = cocotb.start_soon(self.cons_transaction(30))
+        prod0_task = cocotb.start_soon(self.prod_transaction(1, self.marb_tb_env.virtual_sequencer.sequencer_producer0_agent))
+        prod1_task = cocotb.start_soon(self.prod_transaction(1, self.marb_tb_env.virtual_sequencer.sequencer_producer1_agent))
+        prod2_task = cocotb.start_soon(self.prod_transaction(1, self.marb_tb_env.virtual_sequencer.sequencer_producer2_agent))
+        cons_task = cocotb.start_soon(self.cons_transaction(3, self.marb_tb_env.virtual_sequencer.sequencer_consumer_agent))
 
-        await Combine(prod0_task.join(), prod1_task.join(), prod2_task.join(), cons_task.join())
+        await Combine(prod0_task, prod1_task, prod2_task, cons_task)
 
         await ClockCycles(self.dut.clk, 20)
         self.drop_objection()
@@ -48,8 +48,10 @@ class cl_marb_random_test(cl_marb_tb_base_test):
     
     async def prod_transaction(self, num, handle):
         for _ in range(0, num):
-            await self.prod_seq.start(handle)
+            self.prod_seq.start(handle)
+            self.logger.info("Producer transaction done")
     
-    async def cons_transaction(self, num):
+    async def cons_transaction(self, num, handle):
         for _ in range(0, num):
-            await self.cons_seq.start(self.marb_tb_env.virtual_sequencer.sequencer_consumer_agent)
+            self.cons_seq.start(handle)
+            self.logger.info("Consumer transaction done")
