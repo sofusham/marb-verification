@@ -34,12 +34,13 @@ class cl_marb_random_test(cl_marb_tb_base_test):
         cocotb.start_soon(conf_seq.start(self.marb_tb_env.virtual_sequencer))
 
         # Launch sequences (as many consumer transactions as producer transactions)
-        prod0_task = cocotb.start_soon(self.prod_transaction(1, self.marb_tb_env.virtual_sequencer.sequencer_producer0_agent))
-        prod1_task = cocotb.start_soon(self.prod_transaction(1, self.marb_tb_env.virtual_sequencer.sequencer_producer1_agent))
-        prod2_task = cocotb.start_soon(self.prod_transaction(1, self.marb_tb_env.virtual_sequencer.sequencer_producer2_agent))
+        prod0_task = cocotb.start_soon(self.prod_transaction(10, self.marb_tb_env.virtual_sequencer.sequencer_producer0_agent))
+        prod1_task = cocotb.start_soon(self.prod_transaction(10, self.marb_tb_env.virtual_sequencer.sequencer_producer1_agent))
+        prod2_task = cocotb.start_soon(self.prod_transaction(10, self.marb_tb_env.virtual_sequencer.sequencer_producer2_agent))
         cons_task = cocotb.start_soon(self.cons_transaction(1, self.marb_tb_env.virtual_sequencer.sequencer_consumer_agent))
 
-        await Combine(prod0_task, prod1_task, prod2_task, cons_task)
+        # Wait until all tasks are done
+        await Combine(prod0_task, prod1_task, prod2_task)
 
         await ClockCycles(self.dut.clk, 20)
         self.drop_objection()

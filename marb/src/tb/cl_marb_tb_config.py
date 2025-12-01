@@ -56,8 +56,7 @@ class cl_marb_tb_config(uvm_object):
         #self.sdt_cons_cfg.vif = cl_sdt_interface(clk_signal = None, rst_signal = None, name = "sdt_cons_vif") # fix clk and rst in base test
         self.sdt_cons_cfg.is_active = uvm_active_passive_enum.UVM_ACTIVE
         self.sdt_cons_cfg.driver = DriverType.CONSUMER
-        #self.sdt_cons_cfg.num_consumer_seq = None
-        self.sdt_cons_cfg.num_consumer_seq = 3
+        self.sdt_cons_cfg.num_consumer_seq = None
         self.sdt_cons_cfg.enable_transaction_coverage = True
         self.sdt_cons_cfg.enable_delay_coverage = True
         #self.sdt_cons_cfg.seq_item_override = SequenceItemOverride.DEFAULT
