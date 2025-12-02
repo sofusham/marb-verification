@@ -1,4 +1,3 @@
-
 from pyuvm import *
 from cocotb.triggers import Combine
 from uvc.sdt.src import *
