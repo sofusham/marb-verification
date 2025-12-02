@@ -45,6 +45,12 @@ class cl_marb_tb_base_test(uvm_test):
         # TB environment handler
         self.marb_tb_env = None
 
+        # Declare sdt assertions ------------------------
+        self.sdt_prod0_assert_check = None
+        self.sdt_prod1_assert_check = None
+        self.sdt_prod2_assert_check = None
+        self.sdt_cons_assert_check = None
+
         # Quick fix because of warnings og PYVSC
         warnings.simplefilter("ignore")
 
@@ -113,6 +119,36 @@ class cl_marb_tb_base_test(uvm_test):
         self.assert_check_apb = if_apb_assert_check(clk_signal  = self.dut.clk,
                                                     rst_signal  = self.dut.rst)
         self.assert_check_apb.cfg = self.cfg.apb_cfg
+
+        # sdt assertions checkers connection --------------------------
+        self.sdt_prod0_assert_check = sdt_if_assert_check(clk_signal = self.dut.clk,
+                                                          rst_signal = self.dut.rst,
+                                                          rd_signal   = self.dut.c0_rd,
+                                                          wr_signal   = self.dut.c0_wr,
+                                                          addr_signal = self.dut.c0_addr,
+                                                          wr_data     = self.dut.c0_wr_data)
+
+        self.sdt_prod1_assert_check = sdt_if_assert_check(clk_signal = self.dut.clk,
+                                                          rst_signal = self.dut.rst,
+                                                          rd_signal   = self.dut.c1_rd,
+                                                          wr_signal   = self.dut.c1_wr,
+                                                          addr_signal = self.dut.c1_addr,
+                                                          wr_data     = self.dut.c1_wr_data)
+
+        self.sdt_prod2_assert_check = sdt_if_assert_check(clk_signal = self.dut.clk,
+                                                          rst_signal = self.dut.rst,
+                                                          rd_signal   = self.dut.c2_rd,
+                                                          wr_signal   = self.dut.c2_wr,
+                                                          addr_signal = self.dut.c2_addr,
+                                                          wr_data     = self.dut.c2_wr_data)
+
+        self.sdt_cons_assert_check = sdt_if_assert_check(clk_signal = self.dut.clk,
+                                                         rst_signal = self.dut.rst,
+                                                         rd_signal   = self.dut.m_rd,
+                                                         wr_signal   = self.dut.m_wr,
+                                                         addr_signal = self.dut.m_addr,
+                                                         wr_data     = self.dut.m_wr_data)
+
 
         # Update the interfaces assertions WIDTHs and rd_data val when no ACK
 
@@ -198,6 +234,10 @@ class cl_marb_tb_base_test(uvm_test):
         await self.trigger_reset()
 
         # Start SDT IF assertions chekers for producers and consumer
+        self.sdt_prod0_assert_check.check_assertions()
+        self.sdt_prod1_assert_check.check_assertions()
+        self.sdt_prod2_assert_check.check_assertions()
+        self.sdt_cons_assert_check.check_assertions()
 
         # Start the global ACK checker
 
@@ -236,6 +276,12 @@ class cl_marb_tb_base_test(uvm_test):
         super().report_phase()
 
         assert self.assert_check_apb.passed, "APB IF assertions failed"
+
+        # ----------------
+        assert self.sdt_prod0_assert_check.passed, "producer 0's assertions failed"
+        assert self.sdt_prod1_assert_check.passed, "producer 1's assertions failed"
+        assert self.sdt_prod2_assert_check.passed, "producer 2's assertions failed"
+        assert self.sdt_cons_assert_check.passed, "consumer's assertions failed"        
 
         # Creating coverage report with PyVSC in txt format
         try:

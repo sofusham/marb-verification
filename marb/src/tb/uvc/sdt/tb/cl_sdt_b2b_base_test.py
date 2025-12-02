@@ -42,6 +42,10 @@ class cl_sdt_b2b_base_test(uvm_test):
 
         self.data_check_passed = True
 
+        # Declare sdt assertions ------------------------
+        self.producer_assert_check = None
+        self.consumer_assert_check = None
+
         # Quick fix because of warnings og PYVSC
         warnings.simplefilter("ignore")
 
@@ -75,7 +79,20 @@ class cl_sdt_b2b_base_test(uvm_test):
         self.cfg.sdt_producer_cfg.vif = self.sdt_if
         self.cfg.sdt_consumer_cfg.vif = self.sdt_if
 
-        # Assertions checker
+        # Assertions checker --------------------------
+        self.producer_assert_check = sdt_if_assert_check(clk_signal = cocotb.top.clk,
+                                                        rst_signal = cocotb.top.rst,
+                                                        rd_signal   = cocotb.top.rd,
+                                                        wr_signal   = cocotb.top.wr,
+                                                        addr_signal = cocotb.top.addr,
+                                                        wr_data     = cocotb.top.wr_data)
+
+        self.consumer_assert_check = sdt_if_assert_check(clk_signal = cocotb.top.clk,
+                                                        rst_signal = cocotb.top.rst,
+                                                        rd_signal   = cocotb.top.rd,
+                                                        wr_signal   = cocotb.top.wr,
+                                                        addr_signal = cocotb.top.addr,
+                                                        wr_data     = cocotb.top.wr_data)
 
         # Create TB env
         ConfigDB().set(self, 'sdt_b2b_env', 'sdt_if', self.sdt_if)
@@ -122,6 +139,10 @@ class cl_sdt_b2b_base_test(uvm_test):
         # Starting top seq - should be overwritten in test
         self.top_seq = cl_sdt_b2b_base_seq.create("top_seq")
         await self.top_seq.start(self.sdt_b2b_env.virtual_sequencer)
+
+        # start sdt assertions ---------------------------
+        self.producer_assert_check.check_assertions()
+        self.consumer_assert_check.check_assertions()
 
         self.drop_objection()
         self.logger.info("End run_phase() -> SDT TB base test")
@@ -177,6 +198,10 @@ class cl_sdt_b2b_base_test(uvm_test):
 
         # Creating coverage report with PyVSC
         self.setup_pyvsc_coverage_report()
+
+        # ----------------
+        assert self.producer_assert_check.passed, "producer's assertions failed"
+        assert self.consumer_assert_check.passed, "consumer's assertions failed"
 
     def setup_pyvsc_coverage_report(self):
 
