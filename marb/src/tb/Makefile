@@ -63,7 +63,7 @@ COMPILE_ARGS += -P$(TOPLEVEL).DATA_WIDTH=$(DATA_WIDTH)
 # MODULE is the basename of the Python test file
 #MODULE   := tests.cl_marb_basic_test
 #MODULE   := tests.cl_marb_random_test
-MODULE   := tests.cl_marb_random_dynamic_test
+MODULE   := tests.cl_marb_dynamic_test
 
 # Move the results generated inside the sim_build directory
 COCOTB_RESULTS_FILE = $(shell pwd)/$(SIM_BUILD)/results.xml
