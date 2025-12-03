@@ -48,15 +48,11 @@ class cl_marb_random_test(cl_marb_tb_base_test):
         self.logger.info("End run_phase() -> MARB random traffic test")
     
     async def prod_transaction(self, num, handle):
-        for i in range(0, num):
-            prod_seq = cl_sdt_single_seq.create("prod_seq")
+        for i in range(0, randint(0, num)):
+            prod_seq = cl_sdt_single_zd_seq.create("prod_seq")
             prod_seq.randomize()
             await prod_seq.start(handle)
-                    
-            self.logger.info("Producer transaction done")
     
     async def cons_transaction(self):
         cons_seq = cl_sdt_consumer_rsp_seq.create("cons_seq") # Automatically randomized
         await cons_seq.start(self.marb_tb_env.virtual_sequencer.sequencer_consumer_agent)
-
-        self.logger.info("Consumer transaction done")
