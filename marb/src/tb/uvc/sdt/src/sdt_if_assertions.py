@@ -44,8 +44,8 @@ class sdt_if_assert_check(uvm_subscriber):
 
             if (self.rd.value == 1) or (self.wr.value == 1):
                 try:
-                    if "x" in self.addr.value.binstr:
-                        raise AssertionError(f"addr is 'x' when rd or wr is asserted")
+                    if "X" in self.addr.value.binstr:
+                        raise AssertionError(f"addr is 'X' when rd or wr is asserted")
                 except Exception as msg:
                     self.passed = False
                     print(msg)
@@ -57,8 +57,8 @@ class sdt_if_assert_check(uvm_subscriber):
 
             if self.wr.value == 1:
                 try:
-                    if "x" in self.wr_data.value.binstr:
-                        raise AssertionError(f"wr_data is 'x' when wr is asserted")
+                    if "X" in self.wr_data.value.binstr:
+                        raise AssertionError(f"wr_data is 'X' when wr is asserted")
                 except Exception as msg:
                     self.passed = False
                     print(msg)
