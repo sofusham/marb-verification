@@ -1,9 +1,9 @@
 import vsc
 
 from uvc.sdt.src import *
-from cl_reg_simple_seq import cl_reg_simple_seq
+from vseqs.cl_reg_simple_seq import cl_reg_simple_seq
 from reg_model.seq_lib.cl_reg_setup_seq import cl_reg_setup_seq
-from reg_model.seq_lib.cl_reg_dynamic_seq import cl_reg_static_seq
+from reg_model.seq_lib.cl_reg_dynamic_seq import cl_reg_dynamic_seq
 
 @vsc.randobj
 class cl_reg_simple_dynamic_seq(cl_reg_simple_seq, object):
@@ -16,10 +16,10 @@ class cl_reg_simple_dynamic_seq(cl_reg_simple_seq, object):
     async def body(self):
         await super().body()
 
-        self.sequencer.logger.debug("Starting setup seq (reg_model/seq_lib/cl_reg_setup_seq.py)")
-        setup_seq  = cl_reg_setup_seq.create("setup_seq")
-        await setup_seq.start(self.sequencer)
+        # self.sequencer.logger.debug("Starting setup seq (reg_model/seq_lib/cl_reg_setup_seq.py)")
+        # setup_seq  = cl_reg_setup_seq.create("setup_seq")
+        # await setup_seq.start(self.sequencer)
 
-        self.sequencer.logger.debug("Starting static seq (reg_model/seq_lib/cl_reg_static_seq.py)")
-        static_seq = cl_reg_dynamic_seq.create("static_seq")
-        await static_seq.start(self.sequencer)
+        self.sequencer.logger.debug("Starting dynamic seq (reg_model/seq_lib/cl_reg_dynamic_seq.py)")
+        dynamic_seq = cl_reg_dynamic_seq.create("dynamic_seq")
+        await dynamic_seq.start(self.sequencer)

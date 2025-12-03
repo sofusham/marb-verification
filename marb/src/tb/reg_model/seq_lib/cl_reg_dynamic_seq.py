@@ -14,9 +14,10 @@ class cl_reg_dynamic_seq(cl_reg_base_seq):
         #######################
 
         # set dynamic priority
-        # cif2 > cif1 > cif0     
+        # cif2 > cif1 > cif0
         write_val = 0 | 2 << 16 | 1 << 8 | 0
-        status = await self.sequencer.reg_model.dprio_reg.read(self.bus_map, path_t.FRONTDOOR, check_t.NO_CHECK)
+        print(write_val)
+        status = await self.sequencer.reg_model.dprio_reg.write(write_val, self.bus_map, path_t.FRONTDOOR, check_t.NO_CHECK)
         # Check the status received
         if status == status_t.IS_OK:
             self.sequencer.logger.info(
