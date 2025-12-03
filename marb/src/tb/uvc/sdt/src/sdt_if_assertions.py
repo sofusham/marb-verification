@@ -36,7 +36,7 @@ class sdt_if_assert_check(uvm_subscriber):
                 self.passed = False
                 print(msg)
         
-    # 2. addr must not be 'x' when rd or wr is asserted
+    # 2. addr must not be 'X' when rd or wr is asserted
     async def addr_checker(self):
         while True:
             await RisingEdge(self.clk)
@@ -49,7 +49,8 @@ class sdt_if_assert_check(uvm_subscriber):
                 except Exception as msg:
                     self.passed = False
                     print(msg)
-        
+    
+    # 3. wr_data must not be 'X' when wr is asserted
     async def wr_data_checker(self):
         while True:
             await RisingEdge(self.clk)
