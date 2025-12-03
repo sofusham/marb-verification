@@ -84,4 +84,6 @@ class cl_marb_tb_env(uvm_env):
         self.reg_model.bus_map.set_sequencer(self.apb_agent.sequencer)
         self.reg_model.bus_map.set_adapter(self.adapter)
 
+        self.virtual_sequencer.sequencer_apb_agent = self.apb_agent.sequencer
+
         self.logger.info("End connect_phase() -> MARB env")

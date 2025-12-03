@@ -158,6 +158,9 @@ class cl_marb_tb_base_test(uvm_test):
 
         # Quick fix
         uvm_factory().set_type_override_by_type(cl_sdt_seq_item, sdt_change_width(8,8))
+        #uvm_factory().set_type_override_by_type(cl_apb_seq_item, apb_change_width(self.cfg.apb_cfg.ADDR_WIDTH, self.cfg.apb_cfg.DATA_WIDTH))
+        uvm_factory().set_type_override_by_type(cl_apb_seq_item, apb_change_width(32, 32))
+
 
         self.logger.info("End build_phase() -> MARB base test")
 
