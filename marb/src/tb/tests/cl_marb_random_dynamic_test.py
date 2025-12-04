@@ -36,15 +36,15 @@ class cl_marb_random_dynamic_test(cl_marb_tb_base_test):
         await conf_seq.start(self.marb_tb_env.virtual_sequencer)
 
         # Launch sequences
-        prod0_task = cocotb.start_soon(self.prod_transaction(1, self.marb_tb_env.virtual_sequencer.sequencer_producer0_agent))
-        prod1_task = cocotb.start_soon(self.prod_transaction(1, self.marb_tb_env.virtual_sequencer.sequencer_producer1_agent))
-        prod2_task = cocotb.start_soon(self.prod_transaction(1, self.marb_tb_env.virtual_sequencer.sequencer_producer2_agent))
+        prod0_task = cocotb.start_soon(self.prod_transaction(10, self.marb_tb_env.virtual_sequencer.sequencer_producer0_agent))
+        prod1_task = cocotb.start_soon(self.prod_transaction(10, self.marb_tb_env.virtual_sequencer.sequencer_producer1_agent))
+        prod2_task = cocotb.start_soon(self.prod_transaction(10, self.marb_tb_env.virtual_sequencer.sequencer_producer2_agent))
         cons_task = cocotb.start_soon(self.cons_transaction(1, self.marb_tb_env.virtual_sequencer.sequencer_consumer_agent))
 
         # Wait until all tasks are done
         await Combine(prod0_task, prod1_task, prod2_task)
 
-        await ClockCycles(self.dut.clk, 20)
+        await ClockCycles(self.dut.clk, 10)
 
         # Change priotization dynamically during runtime
         prio_seq = cl_marb_random_prio_seq.create("prio_seq")
@@ -53,14 +53,14 @@ class cl_marb_random_dynamic_test(cl_marb_tb_base_test):
         #await ClockCycles(self.dut.clk, 20)
 
         # Launch sequences again
-        prod0_task = cocotb.start_soon(self.prod_transaction(1, self.marb_tb_env.virtual_sequencer.sequencer_producer0_agent))
-        prod1_task = cocotb.start_soon(self.prod_transaction(1, self.marb_tb_env.virtual_sequencer.sequencer_producer1_agent))
-        prod2_task = cocotb.start_soon(self.prod_transaction(1, self.marb_tb_env.virtual_sequencer.sequencer_producer2_agent))
+        prod0_task = cocotb.start_soon(self.prod_transaction(10, self.marb_tb_env.virtual_sequencer.sequencer_producer0_agent))
+        prod1_task = cocotb.start_soon(self.prod_transaction(10, self.marb_tb_env.virtual_sequencer.sequencer_producer1_agent))
+        prod2_task = cocotb.start_soon(self.prod_transaction(10, self.marb_tb_env.virtual_sequencer.sequencer_producer2_agent))
 
         # Wait until all tasks are done
         await Combine(prod0_task, prod1_task, prod2_task)
 
-        await ClockCycles(self.dut.clk, 20)
+        await ClockCycles(self.dut.clk, 10)
 
         self.drop_objection()
 
