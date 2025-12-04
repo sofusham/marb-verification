@@ -14,6 +14,7 @@ from uvc.apb.src import *
 
 from cl_marb_tb_config import cl_marb_tb_config
 from cl_marb_tb_env import cl_marb_tb_env
+from cl_marb_ack_assertions import cl_marb_ack_assert_check
 
 _LOG_LEVELS = ["DEBUG", "CRITICAL", "ERROR", "WARNING", "INFO", "NOTSET", "NullHandler"]
 
@@ -50,6 +51,8 @@ class cl_marb_tb_base_test(uvm_test):
         self.sdt_prod1_assert_check = None
         self.sdt_prod2_assert_check = None
         self.sdt_cons_assert_check = None
+
+        self.marb_assert_check = None
 
         # Quick fix because of warnings og PYVSC
         warnings.simplefilter("ignore")
@@ -148,6 +151,13 @@ class cl_marb_tb_base_test(uvm_test):
                                                          wr_signal   = self.dut.m_wr,
                                                          addr_signal = self.dut.m_addr,
                                                          wr_data     = self.dut.m_wr_data)
+        
+        # MARB assertions checker connection ----------------------
+        self.marb_assert_check = cl_marb_ack_assert_check(clk_signal = self.dut.clk,
+                                                          rst_signal = self.dut.rst,
+                                                          ack0_signal = self.dut.c0_ack,
+                                                          ack1_signal = self.dut.c1_ack,
+                                                          ack2_signal = self.dut.c2_ack)
 
 
         # Update the interfaces assertions WIDTHs and rd_data val when no ACK
@@ -244,6 +254,9 @@ class cl_marb_tb_base_test(uvm_test):
         self.sdt_prod2_assert_check.check_assertions()
         self.sdt_cons_assert_check.check_assertions()
 
+        # Start MARB ACK assertions checker
+        self.marb_assert_check.check_assertions()
+
         # Start the global ACK checker
 
         # Start APB IF assertion checker
@@ -286,7 +299,9 @@ class cl_marb_tb_base_test(uvm_test):
         assert self.sdt_prod0_assert_check.passed, "producer 0's assertions failed"
         assert self.sdt_prod1_assert_check.passed, "producer 1's assertions failed"
         assert self.sdt_prod2_assert_check.passed, "producer 2's assertions failed"
-        assert self.sdt_cons_assert_check.passed, "consumer's assertions failed"        
+        assert self.sdt_cons_assert_check.passed, "consumer's assertions failed"
+
+        assert self.marb_assert_check.passed, "MARB ACK assertions failed"        
 
         # Creating coverage report with PyVSC in txt format
         try:
