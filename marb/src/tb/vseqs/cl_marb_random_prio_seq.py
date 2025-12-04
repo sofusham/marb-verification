@@ -13,6 +13,8 @@ class cl_marb_random_prio_seq(cl_marb_tb_base_seq):
 
     def __init__(self, name = "cl_marb_random_prio_seq"):
         super().__init__(name)
+
+        # Hack for being able to clock in the sequence
         self.dut = None
 
         self.sequencer = None
@@ -22,12 +24,10 @@ class cl_marb_random_prio_seq(cl_marb_tb_base_seq):
         await super().body()
 
         # Disable memory arbiter before changing priority
-        # TODO: Implement disabling arbiter without implementing new reg_seq
         self.sequencer.logger.info("Disabling Memory Arbiter before changing priority")
         disable_seq = cl_reg_disable_seq.create("disable_seq")
         await disable_seq.start(self.sequencer)
         # Write random priority configuration to APB bus
-        # TODO: Implement new constraints for priority configuration and apb fields (i.e. addr(0x0 and 0x4), data, etc)
         prio_seq = cl_apb_single_zd_seq.create("marb_tb_apb_prio_seq")
         with prio_seq.randomize_with() as it:
             it.s_item.addr in vsc.rangelist([0x0, 0x4])
@@ -43,7 +43,6 @@ class cl_marb_random_prio_seq(cl_marb_tb_base_seq):
         await ClockCycles(self.dut.clk, 10)
 
         # Enable memory arbiter after changing priority
-        # TODO: Implement enabling arbiter without implementing new reg_seq
         self.sequencer.logger.info("Enabling Memory Arbiter after changing priority")
         enable_seq = cl_reg_enable_seq.create("enable_seq")
         await enable_seq.start(self.sequencer)
