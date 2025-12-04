@@ -31,15 +31,13 @@ class cl_marb_random_prio_seq(cl_marb_tb_base_seq):
         prio_seq = cl_apb_single_zd_seq.create("marb_tb_apb_prio_seq")
         with prio_seq.randomize_with() as it:
             it.s_item.addr in vsc.rangelist([0x0, 0x4])
-            it.s_item.data in vsc.rangelist([0x0, 0x2])
             #it.op == OpType.WRITE
             it.s_item.op == 1  # WRITE
             it.s_item.strb == 0xF
-            # Would turn on the MARB again
-            #with vsc.implies(it.s_item.addr == 0x0):
-            #    it.s_item.data in vsc.rangelist([0x1, 0x3])
+            with vsc.implies(it.s_item.addr == 0x0):
+                it.s_item.data in vsc.rangelist([0x0, 0x2])
             #vsc.implies(it.s_item.addr == 0x0, it.s_item.data.inside(vsc.rangelist([0x1, 0x3])))
-
+        self.sequencer.logger.info(f"Changing priority configuration: ADDR=0x{prio_seq.s_item.addr:08X}, DATA=0x{prio_seq.s_item.data:08X}")
         prio_task = cocotb.start_soon(prio_seq.start(self.sequencer.sequencer_apb_agent))
 
         await ClockCycles(self.dut.clk, 10)
