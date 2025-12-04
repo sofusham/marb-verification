@@ -3,7 +3,7 @@ from pyuvm import *
 from cocotb.triggers import RisingEdge, FallingEdge, ReadOnly
 
 class sdt_if_assert_check(uvm_subscriber):
-    def __init__(self, clk_signal, rst_signal = None, rd_signal = None, wr_signal = None, addr_signal = None, wr_data = None, name = "sdt_if_assert_check"):
+    def __init__(self, clk_signal = None, rst_signal = None, rd_signal = None, wr_signal = None, addr_signal = None, wr_data = None, name = "sdt_if_assert_check"):
         
         self.name = name
 
